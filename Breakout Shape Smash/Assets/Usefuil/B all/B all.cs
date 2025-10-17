@@ -17,17 +17,27 @@ public class Ball : MonoBehaviour
         transform.position += new Vector3(xspeed, yspeed, 0) * Time.deltaTime;
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log(other.gameObject.ToString());
-        if (other.gameObject.tag == "side")
+        if (collision.gameObject.tag == "side")
         {
-            xspeed *= -1;
+            xspeed = xspeed *  -1;
 
         }
-        else if (other.gameObject.tag == "top")
+        else if (collision.gameObject.tag == "top" || collision.gameObject.tag == "Paddle")
         {
             yspeed = yspeed * -1;
+        }
+        else if(collision.gameObject.tag == "Block")
+        {
+            float ydif = transform.position.y - collision.transform.position.y;
+            if(ydif < 2 && ydif > -2) {
+                xspeed = xspeed * -1;
+            }
+            else
+            {
+                yspeed = yspeed * -1;
+            }
         }
     }
 }
