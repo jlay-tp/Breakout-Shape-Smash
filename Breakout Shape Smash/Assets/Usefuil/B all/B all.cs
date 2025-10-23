@@ -34,10 +34,6 @@ public class Ball : MonoBehaviour
         else if (collision.gameObject.tag == "top" || collision.gameObject.tag == "Paddle")
         {
             yspeed = yspeed * -1;
-            if(rand == 1)
-            {
-                xspeed = xspeed * -1;
-            }
         }
         else if(collision.gameObject.tag == "Block")
         {

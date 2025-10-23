@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
-    int lives = 1;
+    int lives;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        lives = GameManager.instance.GetLevel();
     }
 
     // Update is called once per frame
