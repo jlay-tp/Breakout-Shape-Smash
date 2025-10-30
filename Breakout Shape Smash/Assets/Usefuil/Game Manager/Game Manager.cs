@@ -1,10 +1,18 @@
+using TMPro;
+using Unity.AppUI.UI;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] Ball ball;
-    [SerializeField] Paddle paddle;
+    [SerializeField] GameObject ball;
+    [SerializeField] GameObject paddle;
     [SerializeField] GameObject block;
+    [SerializeField] GameObject NextLevel;
+    [SerializeField] GameObject Shop;
+    [SerializeField] GameObject option1;
+    [SerializeField] GameObject option2;
+    [SerializeField] GameObject option3;
     public static GameManager instance;
     int level = 1;
     int setupTimesx = 15;
@@ -32,7 +40,7 @@ public class GameManager : MonoBehaviour
        GameObject[] blocks =  GameObject.FindGameObjectsWithTag("Block");
         if(blocks.Length == 0)
         {
-            LevelUp();
+            LevelOver();
         }
     }
 
@@ -58,9 +66,25 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void ShopSetup() { 
+       paddle.SetActive(false);
+       NextLevel.SetActive(false);
+       Shop.SetActive(false);
+        
+    }
+
+    void LevelOver()
+    {
+       option1.SetActive(false); 
+        option2.SetActive(false);
+        option3.SetActive(false);
+
+    }
+
     void LevelUp()
     {
         level++;
+        paddle.SetActive(true);
         Setup();
     }
 }
