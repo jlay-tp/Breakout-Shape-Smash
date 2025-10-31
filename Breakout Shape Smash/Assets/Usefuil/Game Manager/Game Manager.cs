@@ -110,7 +110,6 @@ public class GameManager : MonoBehaviour
         NextLevel.SetActive(false);
         paddle.SetActive(false ) ;
         level++;
-        paddle.SetActive(true);
         Setup();
     }
 
