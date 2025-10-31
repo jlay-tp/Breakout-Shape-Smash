@@ -18,6 +18,10 @@ public class Block : MonoBehaviour
         }
     }
 
+    public int GetLives()
+    {
+        return lives;
+    }
     public void LoseLife(int num)
     {
         lives = lives - num;

@@ -19,12 +19,13 @@ public class GameManager : MonoBehaviour
     int setupTimesy = 3;
     float sizeFactorx = 1f;
     float sizeFactory = 1.5f;
+    bool runOnceLevelOver = true;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        paddle.SetActive(true);
         instance = this;
-        Vector3 padPos = paddle.GetComponent<Transform>().position;
-        Instantiate(ball, new Vector3(padPos.x, padPos.y + 1, 0), Quaternion.identity);
+        
 
 
         Setup();
@@ -40,7 +41,12 @@ public class GameManager : MonoBehaviour
        GameObject[] blocks =  GameObject.FindGameObjectsWithTag("Block");
         if(blocks.Length == 0)
         {
-            LevelOver();
+            if (runOnceLevelOver)
+            {
+                LevelOver();
+                runOnceLevelOver=false;
+            }
+            
         }
     }
 
@@ -51,6 +57,10 @@ public class GameManager : MonoBehaviour
 
     void Setup()
     {
+        //Spawn all balls here with foreach 
+        Vector3 padPos = paddle.GetComponent<Transform>().position;
+        Instantiate(ball, new Vector3(padPos.x, padPos.y + 1, 0), Quaternion.identity);
+        paddle.SetActive(true);
         Vector3 startingPos = new Vector3(-7.5f, 3.5f, 0);
         for (int j = 0; j <= setupTimesy; j++)
         {
@@ -64,27 +74,52 @@ public class GameManager : MonoBehaviour
             startingPos = startingPos + new Vector3(0, -1 * sizeFactory, 0);
             startingPos = new Vector3(-7.5f, startingPos.y, 0);
         }
+        runOnceLevelOver = true;
     }
 
-    void ShopSetup() { 
+    public void ShopSetup() { 
        paddle.SetActive(false);
        NextLevel.SetActive(false);
        Shop.SetActive(false);
         
     }
 
-    void LevelOver()
+    public void LevelOver()
     {
-       option1.SetActive(false); 
-        option2.SetActive(false);
-        option3.SetActive(false);
+        paddle.SetActive(false);
+       option1.SetActive(true); 
+        option2.SetActive(true);
+        option3.SetActive(true);
+        
+
 
     }
-
-    void LevelUp()
+    public void CompletedUpgrades()
     {
+        Shop.SetActive(true);
+        NextLevel.SetActive(true);
+        option1.SetActive(false);
+        option2.SetActive(false );
+        option3.SetActive(false);
+    }
+
+   public void LevelUp()
+    {
+        
+        Shop.SetActive(false);
+        NextLevel.SetActive(false);
+        paddle.SetActive(false ) ;
         level++;
         paddle.SetActive(true);
         Setup();
+    }
+
+    public void temporary()
+    {
+        GameObject[] blocks = GameObject.FindGameObjectsWithTag("Block");
+        foreach (GameObject block in blocks)
+        {
+            block.GetComponent<Block>().LoseLife(block.GetComponent<Block>().GetLives());
+        }
     }
 }
