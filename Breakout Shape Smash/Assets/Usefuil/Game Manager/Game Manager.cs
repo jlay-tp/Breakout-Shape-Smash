@@ -1,7 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using TMPro;
 using Unity.AppUI.UI;
 using Unity.VisualScripting;
+using UnityEditor.EditorTools;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,12 +23,35 @@ public class GameManager : MonoBehaviour
     int level = 1;
     int setupTimesx = 15;
     int setupTimesy = 3;
+    int o1ind;
+    int o2ind;
+    int o3ind;
     float sizeFactorx = 1f;
     float sizeFactory = 1.5f;
     bool runOnceLevelOver = true;
+
+    public class Upgrade
+    {
+        public GameObject appliedTo;
+        public string text;
+        public string statName;
+        public float value;
+
+        public Upgrade(GameObject appliedTo, string text, string statName, float value)
+        {
+            this.appliedTo = appliedTo;
+            this.text = text;
+            this.statName = statName;
+            this.value = value;
+        }
+    }
+
+    Upgrade[] upgrades = new Upgrade[5];
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        FillUpgrades();
         paddle.SetActive(true);
         instance = this;
         
@@ -83,16 +112,70 @@ public class GameManager : MonoBehaviour
        Shop.SetActive(false);
         
     }
+    private int[] fix(int index, int[] prev)
+    {
+        int[] indices = new int[prev.Length - 1];
+        int currentIndex = 0;
 
+        for (int i = 0; i < prev.Length; i++)
+        {
+            if (i != index)
+            {
+                indices[currentIndex] = prev[i];
+                currentIndex++;
+            }
+        }
+
+        return indices;
+    }
     public void LevelOver()
     {
+        int[] indices = new int[upgrades.Length];
+        for(int i = 0; i < upgrades.Length; i++)
+        {
+            indices[i] = i;
+        }
+    
+        int rand1 = indices[Random.Range(0, indices.Length)];
+        o1ind = rand1;
+        indices = fix(rand1, indices);
+        int rand2 = indices[Random.Range(0, indices.Length)];
+        o2ind = rand2;
+        indices = fix(rand2, indices);
+        int rand3 = Random.Range(0, indices.Length);
+        o3ind = rand3;
+        indices = fix(rand3, indices);
+
         paddle.SetActive(false);
-       option1.SetActive(true); 
+        option1.SetActive(true);
+        option1.GetComponent<TextMeshProUGUI>().text = upgrades[rand1].text;
         option2.SetActive(true);
+        option2.GetComponent<TextMeshProUGUI>().text = upgrades[rand2].text;
         option3.SetActive(true);
+        option3.GetComponent<TextMeshProUGUI>().text = upgrades[rand3].text;
+
+
+
+    }
+
+    public void Apply(int choice)
+    {
+        Upgrade app = upgrades[0];
+        if (choice == 1)
+        {
+           app = upgrades[o1ind];
+        }
+        else if (choice == 2)
+        {
+            app = upgrades[o2ind];
+        }
+        else
+        {
+            app = upgrades[o3ind];
+        }
+
+       
         
-
-
     }
     public void CompletedUpgrades()
     {
@@ -112,6 +195,15 @@ public class GameManager : MonoBehaviour
         level++;
         Setup();
     }
+
+    void FillUpgrades()
+    {
+       for(int i = 0; i < 5; i++)
+        {
+            upgrades[i] = new Upgrade(paddle, i.ToString(), "Korea", 6);
+        }
+    }
+
 
     public void temporary()
     {
