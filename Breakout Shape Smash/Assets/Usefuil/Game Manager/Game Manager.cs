@@ -9,6 +9,7 @@ using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+
 public class GameManager : MonoBehaviour
 {
     [SerializeField] GameObject ball;
@@ -29,29 +30,17 @@ public class GameManager : MonoBehaviour
     float sizeFactorx = 1f;
     float sizeFactory = 1.5f;
     bool runOnceLevelOver = true;
+    [SerializeField] GameObject u1;
+    [SerializeField] GameObject u2;
+    [SerializeField] GameObject u3;
+    [SerializeField] GameObject u4;
+    [SerializeField] GameObject u5;
 
-    public class Upgrade
-    {
-        public GameObject appliedTo;
-        public string text;
-        public string statName;
-        public float value;
-
-        public Upgrade(GameObject appliedTo, string text, string statName, float value)
-        {
-            this.appliedTo = appliedTo;
-            this.text = text;
-            this.statName = statName;
-            this.value = value;
-        }
-    }
-
-    Upgrade[] upgrades = new Upgrade[5];
+    GameObject[] upgrades = new GameObject[5];
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        FillUpgrades();
         paddle.SetActive(true);
         instance = this;
         
@@ -135,24 +124,23 @@ public class GameManager : MonoBehaviour
         {
             indices[i] = i;
         }
-    
-        int rand1 = indices[Random.Range(0, indices.Length)];
+        int rand1 = indices[UnityEngine.Random.Range(0, indices.Length)];
         o1ind = rand1;
         indices = fix(rand1, indices);
-        int rand2 = indices[Random.Range(0, indices.Length)];
+        int rand2 = indices[UnityEngine.Random.Range(0, indices.Length)];
         o2ind = rand2;
         indices = fix(rand2, indices);
-        int rand3 = Random.Range(0, indices.Length);
+        int rand3 = UnityEngine.Random.Range(0, indices.Length);
         o3ind = rand3;
         indices = fix(rand3, indices);
 
         paddle.SetActive(false);
         option1.SetActive(true);
-        option1.GetComponent<TextMeshProUGUI>().text = upgrades[rand1].text;
+        option1.GetComponent<TextMeshProUGUI>().text = upgrades[rand1].GetComponent<upgradeReal>().text;
         option2.SetActive(true);
-        option2.GetComponent<TextMeshProUGUI>().text = upgrades[rand2].text;
+        option2.GetComponent<TextMeshProUGUI>().text = upgrades[rand2].GetComponent<upgradeReal>().text;
         option3.SetActive(true);
-        option3.GetComponent<TextMeshProUGUI>().text = upgrades[rand3].text;
+        option3.GetComponent<TextMeshProUGUI>().text = upgrades[rand3].GetComponent<upgradeReal>().text;
 
 
 
@@ -160,7 +148,7 @@ public class GameManager : MonoBehaviour
 
     public void Apply(int choice)
     {
-        Upgrade app = upgrades[0];
+        GameObject app = upgrades[0];
         if (choice == 1)
         {
            app = upgrades[o1ind];
@@ -194,14 +182,6 @@ public class GameManager : MonoBehaviour
         paddle.SetActive(false ) ;
         level++;
         Setup();
-    }
-
-    void FillUpgrades()
-    {
-       for(int i = 0; i < 5; i++)
-        {
-            upgrades[i] = new Upgrade(paddle, i.ToString(), "Korea", 6);
-        }
     }
 
 
