@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using TMPro;
 using Unity.AppUI.UI;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -36,15 +37,44 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject u4;
     [SerializeField] GameObject u5;
 
-    GameObject[] upgrades = new GameObject[5];
+    Upgrade[] upgrades = new Upgrade[5];
+
+    public enum appliedObject { PADDLE,  RANDOM_BALL, ALL_BALLS, NONE};
+    public enum ballStats { SPEED, POWER, SIZE, NA};
+    public enum paddleStats { LENGTH, SPEED, POWER, NA };
+    public enum other { NEW_BALL, COINS, ITEM, DOUBLE_NEXT, NA}
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public class Upgrade
+    {
+        public appliedObject applied;
+        public ballStats ballStats;
+        public paddleStats paddleStats;
+        public other other;
+        public string text;
+        public int value;
+         
+        public Upgrade(appliedObject appliedObject, string text, int value, ballStats bs, paddleStats ps, other o)
+        {
+            this.applied = appliedObject;
+            this.ballStats = bs;
+            this.paddleStats = ps;
+            this.other = o;
+            this.text = text;
+            this.value = value;
+        }
+    }
     void Start()
     {
         paddle.SetActive(true);
         instance = this;
-        
 
+        // Temporary filling the upgrades array
+        upgrades[0] = new Upgrade(appliedObject.PADDLE, "Paddle +1 length", 1, ballStats.NA, paddleStats.LENGTH, other.NA);
+        upgrades[1] = new Upgrade(appliedObject.RANDOM_BALL, "Give a random ball +2 speed", 2, ballStats.SPEED, paddleStats.NA, other.NA);
+        upgrades[2] = new Upgrade(appliedObject.ALL_BALLS, "Give all balls +1 power", 1, ballStats.POWER, paddleStats.NA, other.NA);
+        upgrades[3] = new Upgrade(appliedObject.NONE, "Double the value of the next upgrade", 2, ballStats.NA, paddleStats.NA, other.DOUBLE_NEXT);
+        upgrades[4] = new Upgrade(appliedObject.NONE, "Gain 50 coins", 50, ballStats.NA, paddleStats.NA, other.COINS);
 
         Setup();
         
@@ -124,47 +154,139 @@ public class GameManager : MonoBehaviour
         {
             indices[i] = i;
         }
-        int rand1 = indices[UnityEngine.Random.Range(0, indices.Length)];
+        int r1 = UnityEngine.Random.Range(0, indices.Length);
+        int rand1 = indices[r1];
         o1ind = rand1;
-        indices = fix(rand1, indices);
-        int rand2 = indices[UnityEngine.Random.Range(0, indices.Length)];
+        indices = fix(r1, indices);
+        int r2 = UnityEngine.Random.Range(0, indices.Length);
+        int rand2 = indices[r2];
         o2ind = rand2;
-        indices = fix(rand2, indices);
-        int rand3 = UnityEngine.Random.Range(0, indices.Length);
+        indices = fix(r2, indices);
+        int r3 = UnityEngine.Random.Range(0, indices.Length);
+        int rand3 = indices[r3];
         o3ind = rand3;
-        indices = fix(rand3, indices);
 
         paddle.SetActive(false);
         option1.SetActive(true);
-        option1.GetComponent<TextMeshProUGUI>().text = upgrades[rand1].GetComponent<upgradeReal>().text;
+        option1.GetComponent<TextMeshProUGUI>().text = upgrades[rand1].text;
         option2.SetActive(true);
-        option2.GetComponent<TextMeshProUGUI>().text = upgrades[rand2].GetComponent<upgradeReal>().text;
+        option2.GetComponent<TextMeshProUGUI>().text = upgrades[rand2].text;
         option3.SetActive(true);
-        option3.GetComponent<TextMeshProUGUI>().text = upgrades[rand3].GetComponent<upgradeReal>().text;
+        option3.GetComponent<TextMeshProUGUI>().text = upgrades[rand3].text;
 
-
+        
 
     }
 
     public void Apply(int choice)
     {
-        GameObject app = upgrades[0];
+        int ind = choice;
         if (choice == 1)
         {
-           app = upgrades[o1ind];
+            ind = o1ind;
         }
         else if (choice == 2)
         {
-            app = upgrades[o2ind];
+            ind = o2ind;
         }
         else
         {
-            app = upgrades[o3ind];
+            ind = o3ind;
         }
 
-       
-        
+        Upgrade upgrade = upgrades[ind];
+        switch (upgrade.applied)
+        {
+            case appliedObject.ALL_BALLS:
+                switch (upgrade.ballStats)
+                {
+                    case ballStats.POWER:
+                        // find game objects with tag "Ball"
+                        // for each increase its power stat by value
+                        GameObject[] balls = GameObject.FindGameObjectsWithTag("Ball");
+                        foreach (GameObject ball in balls)
+                        {
+                            ball.GetComponent<Ball>().increasePower(upgrade.value);
+                        }
+                        break;
+                    case ballStats.SPEED:
+                        // find game objects with tag "Ball"
+                        // for each increase its speed stat by value
+                        GameObject[] ballsSpeed = GameObject.FindGameObjectsWithTag("Ball");
+                        foreach (GameObject ball in ballsSpeed)
+                        {
+                            ball.GetComponent<Ball>().increaseSpeed(upgrade.value);
+                        }
+                        break;
+                    case ballStats.SIZE:
+                        // find game objects with tag "Ball"
+                        // get their transform component
+                        // increase x and y scale by value
+                        GameObject[] ballsSize = GameObject.FindGameObjectsWithTag("Ball");
+                        foreach (GameObject ball in ballsSize)
+                        {
+                            ball.GetComponent<Ball>().increaseSize(upgrade.value);
+                        }
+                        break;
+                }
+                break;
+            case appliedObject.RANDOM_BALL:
+                switch (upgrade.ballStats)
+                {
+                    case ballStats.POWER:
+                        // find game objects with tag "Ball"
+                        // generate a random number between 0 and size of array and increase its power stat by value
+                        break;
+                    case ballStats.SPEED:
+                        // find game objects with tag "Ball"
+                        // generate a random number between 0 and size of array and increase its speed stat by value
+                        break;
+                    case ballStats.SIZE:
+                        // find game objects with tag "Ball"
+                        // generate a random number between 0 and size of array and get their transform component
+                        // increase x and y scale by value
+                        break;
+                }
+                break;
+            case appliedObject.PADDLE:
+                switch (upgrade.paddleStats)
+                {
+                    case paddleStats.POWER:
+                        //Increase power of paddle using reference in game manager
+                        break;
+                    case paddleStats.SPEED:
+                        //Increase speed of paddle using reference in game manager
+                        break;
+                    case paddleStats.LENGTH:
+                        //Increase length of paddle using reference in game manager
+                        break;
+                }
+                break;
+            case appliedObject.NONE:
+                switch (upgrade.other)
+                {
+                    case other.COINS:
+                        // increase # of coins using coins variable in game manager
+                        break;
+                    case other.DOUBLE_NEXT:
+                        // boolean still needs to be created and added to the apply method
+                        // trigger a boolean that will be checked at the start of the apply function
+                        break;
+                    case other.NEW_BALL:
+                        // call the ball adding function from game manager or get a reference to whatever object adds balls to the user
+                        break;
+                    case other.ITEM:
+                        // generate a random number and use it to pick a random item to give to the user
+                        break;
+                }
+                break;
+        }
+            
     }
+    
+
+    
+    
     public void CompletedUpgrades()
     {
         Shop.SetActive(true);

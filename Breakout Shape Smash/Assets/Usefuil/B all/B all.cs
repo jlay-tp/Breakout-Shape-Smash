@@ -1,3 +1,4 @@
+using System.ComponentModel.Design.Serialization;
 using UnityEngine;
 
 public class Ball : MonoBehaviour
@@ -21,6 +22,20 @@ public class Ball : MonoBehaviour
     public int GetPower()
     {
         return power;
+    }
+
+    public void increasePower(int value)
+    {
+        power += value;
+    }
+    public void increaseSpeed(int value)
+    {
+        xspeed += value;
+        yspeed += value;
+    }
+    public void increaseSize(int value)
+    {
+        this.GetComponent<Transform>().localScale = this.GetComponent<Transform>().localScale * value;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

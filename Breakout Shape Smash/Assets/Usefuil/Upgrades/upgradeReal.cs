@@ -3,7 +3,7 @@ using UnityEngine;
 public class upgradeReal : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    [SerializeField] public GameObject appliedTo;
+    [SerializeField] public string appliedTo;
     [SerializeField] public string text;
     [SerializeField] public string statName;
     [SerializeField] public float value;
