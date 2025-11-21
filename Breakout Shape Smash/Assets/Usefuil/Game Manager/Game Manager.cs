@@ -21,6 +21,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject option1;
     [SerializeField] GameObject option2;
     [SerializeField] GameObject option3;
+    [SerializeField] GameObject item1;
+    [SerializeField] GameObject item2;
+    [SerializeField] GameObject item3;
+    [SerializeField] GameObject ball1;
+    [SerializeField] GameObject ball2;
+    [SerializeField] GameObject ball3;
     public static GameManager instance;
     int level = 1;
     int setupTimesx = 15;
@@ -31,17 +37,22 @@ public class GameManager : MonoBehaviour
     float sizeFactorx = 1f;
     float sizeFactory = 1.5f;
     bool runOnceLevelOver = true;
-    [SerializeField] GameObject u1;
-    [SerializeField] GameObject u2;
-    [SerializeField] GameObject u3;
-    [SerializeField] GameObject u4;
-    [SerializeField] GameObject u5;
+    bool doubleNext = false;
 
-    Upgrade[] upgrades = new Upgrade[5];
+
+    Upgrade[] upgrades = new Upgrade[12];
+    GameObject[] items = new GameObject[9];
+    int shopI1;
+    int shopI2;
+    int shopI3;
+    GameObject[] balls = new GameObject[9];
+    int shopB1;
+    int shopB2;
+    int shopB3;
 
     public enum appliedObject { PADDLE,  RANDOM_BALL, ALL_BALLS, NONE};
     public enum ballStats { SPEED, POWER, SIZE, NA};
-    public enum paddleStats { LENGTH, SPEED, POWER, NA };
+    public enum paddleStats { LENGTH, POWER, NA };
     public enum other { NEW_BALL, COINS, ITEM, DOUBLE_NEXT, NA}
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -70,12 +81,18 @@ public class GameManager : MonoBehaviour
         instance = this;
 
         // Temporary filling the upgrades array
-        upgrades[0] = new Upgrade(appliedObject.PADDLE, "Paddle +1 length", 1, ballStats.NA, paddleStats.LENGTH, other.NA);
+        upgrades[0] = new Upgrade(appliedObject.PADDLE, "Give the paddle +1 length", 1, ballStats.NA, paddleStats.LENGTH, other.NA);
         upgrades[1] = new Upgrade(appliedObject.RANDOM_BALL, "Give a random ball +2 speed", 2, ballStats.SPEED, paddleStats.NA, other.NA);
         upgrades[2] = new Upgrade(appliedObject.ALL_BALLS, "Give all balls +1 power", 1, ballStats.POWER, paddleStats.NA, other.NA);
         upgrades[3] = new Upgrade(appliedObject.NONE, "Double the value of the next upgrade", 2, ballStats.NA, paddleStats.NA, other.DOUBLE_NEXT);
         upgrades[4] = new Upgrade(appliedObject.NONE, "Gain 50 coins", 50, ballStats.NA, paddleStats.NA, other.COINS);
-
+        upgrades[5] = new Upgrade(appliedObject.RANDOM_BALL, "Give a random ball +2 power", 2, ballStats.POWER, paddleStats.NA, other.NA);
+        upgrades[6] = new Upgrade(appliedObject.RANDOM_BALL, "Give a random ball +2 size", 2, ballStats.SIZE, paddleStats.NA, other.NA);
+        upgrades[7] = new Upgrade(appliedObject.PADDLE, "Give the paddle +1 to power", 1, ballStats.NA, paddleStats.POWER, other.NA);
+        upgrades[8] = new Upgrade(appliedObject.ALL_BALLS, "Give all balls + 1 speed", 1, ballStats.SPEED, paddleStats.NA, other.NA);
+        upgrades[9] = new Upgrade(appliedObject.ALL_BALLS, "Give all balls +1 size", 1, ballStats.SIZE, paddleStats.NA, other.NA);
+        upgrades[10] = new Upgrade(appliedObject.NONE, "Instantly get a low level ball", 1, ballStats.NA, paddleStats.NA, other.NEW_BALL);
+        upgrades[11] = new Upgrade(appliedObject.NONE, "Instantly get a low level item", 1, ballStats.NA, paddleStats.NA, other.ITEM);
         Setup();
         
             
@@ -129,7 +146,42 @@ public class GameManager : MonoBehaviour
        paddle.SetActive(false);
        NextLevel.SetActive(false);
        Shop.SetActive(false);
-        
+        item1.SetActive(true);
+        item2.SetActive(true);
+        item3.SetActive(true);
+         ball1.SetActive(true);
+        ball2.SetActive(true);
+        ball3.SetActive(true);
+        // item ind and ball ind may need to be declared globally
+        int[] itemInd = new int[items.Length];
+        for(int i = 0;i < itemInd.Length; i++)
+        {
+            itemInd[i] = i;
+        }
+        int[] ballInd = new int[balls.Length];
+        for (int y = 0; y < balls.Length; y++) { ballInd[y] = y; }
+        int ir1 = UnityEngine.Random.Range(0, itemInd.Length);
+        shopI1 = itemInd[ir1];
+        itemInd = fix(ir1, itemInd);
+        int ir2 = UnityEngine.Random.Range(0, itemInd.Length);
+        shopI2 = itemInd[ir2];
+        itemInd = fix(ir2, itemInd);
+        int ir3 = UnityEngine.Random.Range(0, itemInd.Length);
+        shopI3 = itemInd[ir3];
+        itemInd = fix(ir3, itemInd);
+        int br1 = UnityEngine.Random.Range(0, ballInd.Length);
+        shopB1 = ballInd[br1];
+        ballInd = fix(br1, ballInd);
+        int br2 = UnityEngine.Random.Range(0, ballInd.Length);
+        shopB2 = ballInd[br2];
+        ballInd = fix(br2, ballInd);
+        int br3 = UnityEngine.Random.Range(0, ballInd.Length);
+        shopB3 = ballInd[br3];
+        ballInd = fix(br3, ballInd);
+
+        // set text of text mesh pro ugui and text of button with coin amount 
+
+
     }
     private int[] fix(int index, int[] prev)
     {
@@ -180,6 +232,11 @@ public class GameManager : MonoBehaviour
 
     public void Apply(int choice)
     {
+        if (doubleNext)
+        {
+            doubleNext = false;
+            Apply(choice);
+        }
         int ind = choice;
         if (choice == 1)
         {
@@ -236,15 +293,24 @@ public class GameManager : MonoBehaviour
                     case ballStats.POWER:
                         // find game objects with tag "Ball"
                         // generate a random number between 0 and size of array and increase its power stat by value
+                        GameObject[] balls = GameObject.FindGameObjectsWithTag("Ball");
+                        int rand = UnityEngine.Random.Range(0, balls.Length);
+                        balls[rand].GetComponent<Ball>().increasePower(upgrade.value);
                         break;
                     case ballStats.SPEED:
                         // find game objects with tag "Ball"
                         // generate a random number between 0 and size of array and increase its speed stat by value
+                        GameObject[] ballsspeed = GameObject.FindGameObjectsWithTag("Ball");
+                        int randspeed = UnityEngine.Random.Range(0, ballsspeed.Length);
+                        ballsspeed[randspeed].GetComponent<Ball>().increaseSpeed(upgrade.value);
                         break;
                     case ballStats.SIZE:
                         // find game objects with tag "Ball"
                         // generate a random number between 0 and size of array and get their transform component
                         // increase x and y scale by value
+                        GameObject[] ballssize = GameObject.FindGameObjectsWithTag("Ball");
+                        int randsize = UnityEngine.Random.Range(0, ballssize.Length);
+                        ballssize[randsize].GetComponent<Ball>().increaseSize(upgrade.value);
                         break;
                 }
                 break;
@@ -252,13 +318,11 @@ public class GameManager : MonoBehaviour
                 switch (upgrade.paddleStats)
                 {
                     case paddleStats.POWER:
-                        //Increase power of paddle using reference in game manager
-                        break;
-                    case paddleStats.SPEED:
-                        //Increase speed of paddle using reference in game manager
+                        paddle.GetComponent<Paddle>().addPower(upgrade.value);
                         break;
                     case paddleStats.LENGTH:
-                        //Increase length of paddle using reference in game manager
+                        Vector3 lScale = paddle.GetComponent<Transform>().localScale;
+                        paddle.GetComponent<Transform>().localScale = new Vector3(lScale.x + upgrade.value, lScale.y, lScale.z);
                         break;
                 }
                 break;
@@ -269,8 +333,7 @@ public class GameManager : MonoBehaviour
                         // increase # of coins using coins variable in game manager
                         break;
                     case other.DOUBLE_NEXT:
-                        // boolean still needs to be created and added to the apply method
-                        // trigger a boolean that will be checked at the start of the apply function
+                        doubleNext = true;
                         break;
                     case other.NEW_BALL:
                         // call the ball adding function from game manager or get a reference to whatever object adds balls to the user
@@ -281,6 +344,8 @@ public class GameManager : MonoBehaviour
                 }
                 break;
         }
+        
+        
             
     }
     

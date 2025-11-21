@@ -107,6 +107,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Ball
   xspeed: 5
   yspeed: 5
+  paddle: {fileID: 0}
   power: 1
 --- !u!50 &788531604000689501
 Rigidbody2D:

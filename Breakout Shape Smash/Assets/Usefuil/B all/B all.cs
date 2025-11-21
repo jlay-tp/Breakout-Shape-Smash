@@ -1,4 +1,5 @@
 using System.ComponentModel.Design.Serialization;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Ball : MonoBehaviour
@@ -48,6 +49,19 @@ public class Ball : MonoBehaviour
         }
         else if (collision.gameObject.tag == "top" || collision.gameObject.tag == "Paddle")
         {
+            if(collision.gameObject.tag == "Paddle")
+            {
+                if (yspeed > 0)
+                {
+                    GameObject paddle = GameObject.FindGameObjectWithTag("Paddle");
+                    yspeed = yspeed + paddle.GetComponent<Paddle>().getPower();
+                }
+                else if (yspeed < 0)
+                {
+                    GameObject paddle = GameObject.FindGameObjectWithTag("Paddle");
+                    yspeed = yspeed - paddle.GetComponent<Paddle>().getPower();
+                }
+            }
             yspeed = yspeed * -1;
         }
         else if(collision.gameObject.tag == "Block")
