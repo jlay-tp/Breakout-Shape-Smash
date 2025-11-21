@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour
         paddle.SetActive(true);
         instance = this;
 
-        // Temporary filling the upgrades array
+      
         upgrades[0] = new Upgrade(appliedObject.PADDLE, "Give the paddle +1 length", 1, ballStats.NA, paddleStats.LENGTH, other.NA);
         upgrades[1] = new Upgrade(appliedObject.RANDOM_BALL, "Give a random ball +2 speed", 2, ballStats.SPEED, paddleStats.NA, other.NA);
         upgrades[2] = new Upgrade(appliedObject.ALL_BALLS, "Give all balls +1 power", 1, ballStats.POWER, paddleStats.NA, other.NA);
