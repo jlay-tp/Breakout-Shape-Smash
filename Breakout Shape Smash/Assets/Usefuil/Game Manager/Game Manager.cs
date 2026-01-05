@@ -6,9 +6,11 @@ using TMPro;
 using Unity.AppUI.UI;
 using Unity.VisualScripting;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.Rendering;
+using static Unity.Collections.AllocatorManager;
 
 
 public class GameManager : MonoBehaviour
@@ -27,6 +29,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject ball1;
     [SerializeField] GameObject ball2;
     [SerializeField] GameObject ball3;
+    [SerializeField] GameObject gameOver;
+    [SerializeField] GameObject restart;
     public static GameManager instance;
     int level = 1;
     int setupTimesx = 15;
@@ -38,6 +42,7 @@ public class GameManager : MonoBehaviour
     float sizeFactory = 1.5f;
     bool runOnceLevelOver = true;
     bool doubleNext = false;
+    bool isGameOver = false;
 
 
     Upgrade[] upgrades = new Upgrade[12];
@@ -106,7 +111,7 @@ public class GameManager : MonoBehaviour
        GameObject[] blocks =  GameObject.FindGameObjectsWithTag("Block");
         if(blocks.Length == 0)
         {
-            if (runOnceLevelOver)
+            if (runOnceLevelOver && !isGameOver)
             {
                 LevelOver();
                 runOnceLevelOver=false;
@@ -120,9 +125,11 @@ public class GameManager : MonoBehaviour
         return level;
     }
 
-    void Setup()
+    public void Setup()
     {
-        //Spawn all balls here with foreach 
+        //Spawn all balls here with foreach
+        gameOver.SetActive(false);
+        restart.SetActive(false);
         Vector3 padPos = paddle.GetComponent<Transform>().position;
         Instantiate(ball, new Vector3(padPos.x, padPos.y + 1, 0), Quaternion.identity);
         paddle.SetActive(true);
@@ -140,6 +147,7 @@ public class GameManager : MonoBehaviour
             startingPos = new Vector3(-7.5f, startingPos.y, 0);
         }
         runOnceLevelOver = true;
+        isGameOver = false;
     }
 
     public void ShopSetup() { 
@@ -371,13 +379,37 @@ public class GameManager : MonoBehaviour
         Setup();
     }
 
+    // actual game over method has to account for #of balls player has 
+    public void GameOver()
+    {
+        isGameOver = true;  
+        paddle.SetActive (false );
+        GameObject[] blocks = GameObject.FindGameObjectsWithTag("Block");
+        foreach (GameObject block in blocks)
+        {
+            block.SetActive(false );
+        }
+        gameOver.SetActive(true);
+        restart.SetActive(true );
+    }
 
+ 
     public void temporary()
     {
         GameObject[] blocks = GameObject.FindGameObjectsWithTag("Block");
         foreach (GameObject block in blocks)
         {
             block.GetComponent<Block>().LoseLife(block.GetComponent<Block>().GetLives());
+        }
+    }
+
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Ball")
+        {
+            GameOver();
+
         }
     }
 }
