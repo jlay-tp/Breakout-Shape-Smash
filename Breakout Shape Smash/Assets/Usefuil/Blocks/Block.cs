@@ -14,6 +14,8 @@ public class Block : MonoBehaviour
     {
         if (lives <= 0)
         {
+            int rand = Random.Range(0, GameManager.instance.GetLevel() + 1);
+            GameManager.instance.UpdateCoins(rand);
             Destroy(gameObject);
         }
     }

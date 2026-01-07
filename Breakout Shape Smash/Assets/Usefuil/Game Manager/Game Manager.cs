@@ -38,6 +38,8 @@ public class GameManager : MonoBehaviour
     int o1ind;
     int o2ind;
     int o3ind;
+    int coins = 0;
+    [SerializeField] TextMeshProUGUI coinText;
     float sizeFactorx = 1f;
     float sizeFactory = 1.5f;
     bool runOnceLevelOver = true;
@@ -107,14 +109,19 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        coinText.text = coins.ToString();
         
        GameObject[] blocks =  GameObject.FindGameObjectsWithTag("Block");
         if(blocks.Length == 0)
         {
             if (runOnceLevelOver && !isGameOver)
             {
+                foreach(GameObject ball in GameObject.FindGameObjectsWithTag("Ball")){
+                    Destroy(ball);
+                }
                 LevelOver();
                 runOnceLevelOver=false;
+                
             }
             
         }
@@ -127,11 +134,11 @@ public class GameManager : MonoBehaviour
 
     public void Setup()
     {
-        //Spawn all balls here with foreach
+        
         gameOver.SetActive(false);
         restart.SetActive(false);
         Vector3 padPos = paddle.GetComponent<Transform>().position;
-        Instantiate(ball, new Vector3(padPos.x, padPos.y + 1, 0), Quaternion.identity);
+        Instantiate(ball, new Vector3(padPos.x, padPos.y + 1, 0), Quaternion.identity);  //Spawn all balls here with foreach
         paddle.SetActive(true);
         Vector3 startingPos = new Vector3(-7.5f, 3.5f, 0);
         for (int j = 0; j <= setupTimesy; j++)
@@ -358,7 +365,10 @@ public class GameManager : MonoBehaviour
     }
     
 
-    
+    public void UpdateCoins(int value)
+    {
+        coins += value;
+    }
     
     public void CompletedUpgrades()
     {
@@ -382,7 +392,8 @@ public class GameManager : MonoBehaviour
     // actual game over method has to account for #of balls player has 
     public void GameOver()
     {
-        isGameOver = true;  
+        isGameOver = true;
+        coins = 0;
         paddle.SetActive (false );
         GameObject[] blocks = GameObject.FindGameObjectsWithTag("Block");
         foreach (GameObject block in blocks)
