@@ -346,6 +346,7 @@ public class GameManager : MonoBehaviour
                 {
                     case other.COINS:
                         // increase # of coins using coins variable in game manager
+                        UpdateCoins(upgrade.value);
                         break;
                     case other.DOUBLE_NEXT:
                         doubleNext = true;
